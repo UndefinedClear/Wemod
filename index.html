@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Guess Game</title>
+</head>
+<body>
+    <h1>Word Guess Game</h1>
+    <button id="start-btn">Start Game</button>
+    <div id="game-container" style="display:none;">
+        <p id="game-message"></p>
+        <div>
+            <input type="text" id="question" placeholder="Ask a yes/no question" />
+            <button id="ask-btn">Ask</button>
+        </div>
+        <div>
+            <input type="text" id="guess" placeholder="Who has the unique word?" />
+            <button id="guess-btn">Guess</button>
+        </div>
+    </div>
+
+    <script>
+        const startBtn = document.getElementById("start-btn");
+        const gameContainer = document.getElementById("game-container");
+        const gameMessage = document.getElementById("game-message");
+        const questionInput = document.getElementById("question");
+        const askBtn = document.getElementById("ask-btn");
+        const guessInput = document.getElementById("guess");
+        const guessBtn = document.getElementById("guess-btn");
+
+        startBtn.addEventListener("click", () => {
+            fetch("/start_game", { method: "POST" })
+                .then(response => response.json())
+                .then(data => {
+                    gameContainer.style.display = "block";
+                    gameMessage.textContent = data.message;
+                });
+        });
+
+        askBtn.addEventListener("click", () => {
+            const question = questionInput.value;
+            fetch("/ask_question", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ question })
+            })
+            .then(response => response.json())
+            .then(data => alert(data.message));
+        });
+
+        guessBtn.addEventListener("click", () => {
+            const guess = guessInput.value;
+            fetch("/guess", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ guess })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                if (data.round) {
+                    gameMessage.textContent = `Round ${data.round}`;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
